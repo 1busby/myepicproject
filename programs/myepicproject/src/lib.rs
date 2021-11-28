@@ -16,12 +16,21 @@ pub mod myepicproject {
     let user = &mut ctx.accounts.user;
 
     let item = ItemStruct {
+      id: base_account.total_gifs,
       gif_link: gif_link.to_string(),
       user_address: *user.to_account_info().key,
+      upvote_count: 0
     };
 
     base_account.gif_list.push(item);
     base_account.total_gifs += 1;
+    Ok(())
+  }
+
+  pub fn upvote_gif(ctx: Context<UpvoteGif>, id: u64) -> ProgramResult {
+    let base_account = &mut ctx.accounts.base_account;
+    let mut gif = base_account.gif_list.iter_mut().find(|r| r.id == id).unwrap();
+    gif.upvote_count += 1;
     Ok(())
   }
 }
@@ -43,10 +52,18 @@ pub struct AddGif<'info> {
   pub user: Signer<'info>,
 }
 
+#[derive(Accounts)]
+pub struct UpvoteGif<'info> {
+  #[account(mut)]
+  pub base_account: Account<'info, BaseAccount>,
+}
+
 #[derive(Debug, Clone, AnchorSerialize, AnchorDeserialize)]
 pub struct ItemStruct {
+  pub id: u64,
   pub gif_link: String,
   pub user_address: Pubkey,
+  pub upvote_count: u64,
 }
 
 #[account]

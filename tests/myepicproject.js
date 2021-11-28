@@ -1,7 +1,7 @@
 const anchor = require('@project-serum/anchor');
 const { SystemProgram } = anchor.web3;
 
-const main = async() => {
+const main = async () => {
   console.log("🚀 Starting test...")
 
   const provider = anchor.Provider.env();
@@ -10,7 +10,7 @@ const main = async() => {
   const program = anchor.workspace.Myepicproject;
 
   const baseAccount = anchor.web3.Keypair.generate()
-  
+
   const tx = await program.rpc.startStuffOff({
     accounts: {
       baseAccount: baseAccount.publicKey,
@@ -24,14 +24,21 @@ const main = async() => {
 
   let account = await program.account.baseAccount.fetch(baseAccount.publicKey);
   console.log('GIF Count 🤔', account.totalGifs.toString());
-  
+
   await program.rpc.addGif('https://media.giphy.com/media/ZjTYDCb3udPsUeepR5/giphy.gif', {
     accounts: {
       baseAccount: baseAccount.publicKey,
       user: provider.wallet.publicKey,
     }
   });
-  
+
+
+  await program.rpc.upvoteGif(new anchor.BN(0), {
+    accounts: {
+      baseAccount: baseAccount.publicKey,
+    }
+  });
+
   account = await program.account.baseAccount.fetch(baseAccount.publicKey);
   console.log('GIF Count 🤔', account.totalGifs.toString());
 
